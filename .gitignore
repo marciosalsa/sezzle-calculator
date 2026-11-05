@@ -1,0 +1,16 @@
+# Backend
+backend/coverage.out
+backend/bin/
+*.exe
+
+# Frontend (see also frontend/.gitignore)
+node_modules/
+frontend/dist/
+frontend/coverage/
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,32 @@
+
+ RUN  v5.1.0 /home/claude/sezzle-calculator/frontend
+      Coverage enabled with v8
+
+
+ Test Files  4 passed (4)
+      Tests  47 passed (47)
+   Start at  13:11:15
+   Duration  5.22s (environment 52%, tests 27%, setup 14%, worker 4%, import 2%, transform 1%)
+
+Environment  jsdom was created 4 times · 2.30s total, 52% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   96.75 |    95.52 |   97.36 |   98.47 |                   
+ src/api           |      96 |    94.44 |   83.33 |   95.83 |                   
+  client.ts        |      96 |    94.44 |   83.33 |   95.83 | 68                
+ src/calculator    |    95.4 |    93.05 |     100 |   98.66 |                   
+  state.ts         |   98.03 |    98.18 |     100 |   97.67 | 121               
+  useCalculator.ts |   91.66 |    76.47 |     100 |     100 | 16-32,43-47       
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 96.75% ( 149/154 )
+Branches     : 95.52% ( 128/134 )
+Functions    : 97.36% ( 37/38 )
+Lines        : 98.47% ( 129/131 )
+================================================================================
