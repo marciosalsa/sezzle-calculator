@@ -117,6 +117,21 @@ describe('<Calculator />', () => {
     expect(display()).toHaveTextContent('0')
   })
 
+  it('clears the history without touching the current result', async () => {
+    render(<Calculator client={fakeClient()} />)
+    expect(screen.queryByRole('button', { name: 'Clear history' })).not.toBeInTheDocument()
+
+    await press('2', 'Multiply', '4', 'Equals')
+    await waitFor(() => expect(screen.getByText('2 × 4 =')).toBeInTheDocument())
+
+    await press('Clear history')
+    expect(screen.queryByText('2 × 4 =')).not.toBeInTheDocument()
+    expect(screen.getByText(/last calculations will show up here/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Clear history' })).not.toBeInTheDocument()
+    expect(display()).toHaveTextContent('8')
+    expect(screen.getByRole('button', { name: 'History' })).toBeInTheDocument() // badge gone
+  })
+
   it('highlights the pending operator', async () => {
     render(<Calculator client={fakeClient()} />)
     await press('3', 'Subtract')
@@ -146,5 +161,63 @@ describe('<Calculator />', () => {
     fireEvent.keyDown(window, { key: 'q' })
     fireEvent.keyDown(window, { key: '9', ctrlKey: true })
     expect(display()).toHaveTextContent('2')
+  })
+
+  describe('mobile panels', () => {
+    function mockPanelWidth(width: number) {
+      const panels = screen.getByTestId('panels')
+      Object.defineProperty(panels, 'clientWidth', { configurable: true, value: width })
+      const scrollTo = vi.fn(({ left }: ScrollToOptions) => {
+        panels.scrollLeft = left ?? 0
+      })
+      Object.defineProperty(panels, 'scrollTo', { configurable: true, value: scrollTo })
+      return { panels, scrollTo }
+    }
+
+    it('starts on the calculator tab', () => {
+      render(<Calculator client={fakeClient()} />)
+      expect(screen.getByRole('button', { name: 'Calculator' })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByRole('button', { name: 'History' })).toHaveAttribute('aria-pressed', 'false')
+    })
+
+    it('scrolls to the history panel when its tab is tapped', async () => {
+      render(<Calculator client={fakeClient()} />)
+      const { scrollTo } = mockPanelWidth(375)
+
+      await press('History')
+
+      expect(scrollTo).toHaveBeenCalledWith({ left: 375 })
+      expect(screen.getByRole('button', { name: 'History' })).toHaveAttribute('aria-pressed', 'true')
+
+      await press('Calculator')
+      expect(scrollTo).toHaveBeenLastCalledWith({ left: 0 })
+    })
+
+    it('updates the active tab when the user swipes', () => {
+      render(<Calculator client={fakeClient()} />)
+      const { panels } = mockPanelWidth(375)
+
+      panels.scrollLeft = 300 // past the midpoint
+      fireEvent.scroll(panels)
+      expect(screen.getByRole('button', { name: 'History' })).toHaveAttribute('aria-pressed', 'true')
+
+      panels.scrollLeft = 50
+      fireEvent.scroll(panels)
+      expect(screen.getByRole('button', { name: 'Calculator' })).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    it('ignores scroll events before layout (zero width)', () => {
+      render(<Calculator client={fakeClient()} />)
+      const { panels } = mockPanelWidth(0)
+      panels.scrollLeft = 300
+      fireEvent.scroll(panels)
+      expect(screen.getByRole('button', { name: 'Calculator' })).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    it('shows how many results are in the history', async () => {
+      render(<Calculator client={fakeClient()} />)
+      await press('1', 'Add', '1', 'Equals')
+      await waitFor(() => expect(screen.getByRole('button', { name: 'History (1)' })).toBeInTheDocument())
+    })
   })
 })

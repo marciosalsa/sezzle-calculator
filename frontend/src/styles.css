@@ -12,16 +12,21 @@
   --accent-soft: #e6e3ff;
   --accent-text: #ffffff;
   --error: #b42318;
-  --screen: #1d1b17;
-  --screen-text: #f6f3ec;
+  --screen: #f0ebe1;
+  --screen-text: #1d1b17;
+  --screen-muted: #7a7468;
+  --screen-error: #b42318;
+  --screen-border: #e2dbcd;
   --radius: 14px;
   --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-num: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   color-scheme: light dark;
 }
 
+/* Dark theme: follows the OS unless the user picked a theme with the toggle
+   (stored as data-theme on <html>). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #121110;
     --surface: #1b1a18;
     --surface-2: #24221f;
@@ -35,7 +40,37 @@
     --accent-soft: #2c2850;
     --error: #ff8a7a;
     --screen: #0a0a09;
+    --screen-text: #f6f3ec;
+    --screen-muted: #a9a395;
+    --screen-error: #ff9b8c;
+    --screen-border: #0a0a09;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #121110;
+  --surface: #1b1a18;
+  --surface-2: #24221f;
+  --text: #f1ede4;
+  --muted: #9b958a;
+  --border: #2f2c28;
+  --key: #262420;
+  --key-hover: #302d29;
+  --fn: #34312c;
+  --accent: #7c70ff;
+  --accent-soft: #2c2850;
+  --error: #ff8a7a;
+  --screen: #0a0a09;
+  --screen-text: #f6f3ec;
+  --screen-muted: #a9a395;
+  --screen-error: #ff9b8c;
+  --screen-border: #0a0a09;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 * {
@@ -45,6 +80,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
@@ -57,6 +93,14 @@ body {
   padding: 40px 16px;
 }
 
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
 .app-header h1 {
   margin: 0;
   font-size: 1.75rem;
@@ -64,7 +108,7 @@ body {
 }
 
 .app-header p {
-  margin: 4px 0 24px;
+  margin: 4px 0 0;
   color: var(--muted);
   font-size: 0.9rem;
 }
@@ -87,6 +131,7 @@ body {
 .screen {
   background: var(--screen);
   color: var(--screen-text);
+  border: 1px solid var(--screen-border);
   border-radius: var(--radius);
   padding: 16px 18px 12px;
   margin-bottom: 14px;
@@ -95,7 +140,7 @@ body {
 }
 
 .expression {
-  color: #a9a395;
+  color: var(--screen-muted);
   font-size: 0.95rem;
   min-height: 1.3em;
 }
@@ -112,13 +157,13 @@ body {
 .status {
   font-family: var(--font-ui);
   font-size: 0.8rem;
-  color: #a9a395;
+  color: var(--screen-muted);
   min-height: 1.3em;
   margin-top: 4px;
 }
 
 .status.is-error {
-  color: #ff9b8c;
+  color: var(--screen-error);
   font-weight: 600;
 }
 
@@ -235,6 +280,28 @@ body {
   text-align: right;
 }
 
+.history-clear {
+  display: block;
+  margin: 14px auto 0;
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 500 0.8rem var(--font-ui);
+  cursor: pointer;
+}
+
+.history-clear:hover {
+  background: var(--key-hover);
+  color: var(--text);
+}
+
+.history-clear:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .history-empty {
   margin: 0;
   color: var(--muted);
@@ -258,22 +325,339 @@ kbd {
   background: var(--surface);
 }
 
-@media (max-width: 680px) {
+.theme-toggle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.theme-toggle:hover {
+  background: var(--key-hover);
+}
+
+.theme-toggle:active {
+  transform: rotate(-20deg) scale(0.94);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+body,
+.calculator,
+.history,
+.screen,
+.key {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+}
+
+/* Panel tabs only exist on small screens. */
+.panel-tabs {
+  display: none;
+}
+
+.panel {
+  min-width: 0;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 20px;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+/* ---- Large screens: a bit roomier ---- */
+@media (min-width: 1200px) {
   .app {
-    padding: 20px 16px;
+    max-width: 1040px;
+    padding-top: 56px;
   }
 
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .keypad {
+    grid-auto-rows: 70px;
+    gap: 10px;
+  }
+
+  .key {
+    font-size: 1.4rem;
+  }
+}
+
+/* ---- Short screens (laptops with small height, phones in landscape) ---- */
+@media (min-width: 681px) and (max-height: 720px) {
+  .app {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .app-header {
+    margin-bottom: 16px;
+  }
+
+  .app-header p,
+  .app-footer {
+    display: none;
+  }
+
+  .keypad {
+    grid-auto-rows: clamp(40px, calc((100dvh - 260px) / 6), 60px);
+    gap: 6px;
+  }
+
+  .screen {
+    padding: 10px 14px 8px;
+    margin-bottom: 10px;
+  }
+
+  .display {
+    font-size: 2rem;
+  }
+}
+
+/* ---- Very short screens (phones in landscape): everything compact so it fits ---- */
+@media (min-width: 681px) and (max-height: 500px) {
+  .app {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .app-header {
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .app-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .theme-toggle {
+    width: 32px;
+    height: 32px;
   }
 
   .calculator {
+    padding: 8px;
+  }
+
+  .screen {
+    padding: 6px 12px;
+    margin-bottom: 8px;
+  }
+
+  .expression,
+  .status {
+    font-size: 0.75rem;
+  }
+
+  .display {
+    font-size: 1.6rem;
+  }
+
+  .keypad {
+    grid-auto-rows: max(32px, calc((100dvh - 180px) / 6));
+    gap: 5px;
+  }
+
+  .key {
+    font-size: 1.05rem;
+  }
+}
+
+/* ---- Phones: full-screen calculator, swipe to history ---- */
+@media (max-width: 680px) {
+  /* The calculator fills the viewport: header on top, panels take the rest
+     and the keypad stretches to the available height. */
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .app-header {
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .app-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .app-header p {
+    display: none;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .app-footer {
+    display: none; /* keyboard shortcuts are irrelevant on touch screens */
+  }
+
+  .panel-tabs {
+    display: flex;
+    gap: 4px;
     max-width: 420px;
+    margin: 0 auto 16px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--surface-2);
+  }
+
+  .panel-tab {
+    flex: 1;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: 600 0.9rem var(--font-ui);
+    cursor: pointer;
+  }
+
+  .panel-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
+  }
+
+  .panel-tab:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Horizontal swipe between calculator and history with native scroll-snap.
+     The negative margin lets each panel span the full screen width. */
+  .layout {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch; /* desktop uses "start"; panels must fill the height here */
+    gap: 0;
+    margin: 0 -16px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .layout::-webkit-scrollbar {
+    display: none;
+  }
+
+  .panel {
+    flex: 0 0 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 4px;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .calculator,
+  .history {
+    max-width: 460px;
     width: 100%;
     margin: 0 auto;
   }
 
+  .calculator {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    max-height: 760px;
+  }
+
+  .history {
+    flex: 0 1 auto;
+    min-height: 0;
+    margin-bottom: 14px; /* minimum gap to the clear button when the list is long */
+    overflow-y: auto;
+  }
+
+  /* Pinned to the bottom of the history panel, within thumb reach. */
+  .history-clear {
+    flex: none;
+    margin: auto auto 4px;
+    padding: 10px 22px;
+    font-size: 0.85rem;
+  }
+
+  .screen {
+    flex: none;
+  }
+
+  /* Six rows share whatever height is left, never smaller than a comfortable tap target. */
   .keypad {
-    grid-auto-rows: 64px;
+    flex: 1;
+    min-height: 0;
+    grid-auto-rows: minmax(48px, 1fr);
+  }
+
+  .key {
+    font-size: clamp(1.15rem, 5.5vw, 1.6rem);
+  }
+
+  .key.equals {
+    font-size: clamp(1.4rem, 7vw, 1.9rem);
+  }
+
+  .display {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+}
+
+/* Very small phones (e.g. iPhone SE): tighter spacing */
+@media (max-width: 680px) and (max-height: 620px) {
+  .panel-tabs {
+    margin-bottom: 10px;
+  }
+
+  .keypad {
+    gap: 6px;
+    grid-auto-rows: minmax(42px, 1fr);
+  }
+
+  .screen {
+    padding: 10px 14px 8px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout {
+    scroll-behavior: auto;
+  }
+
+  .key {
+    transition: none;
   }
 }

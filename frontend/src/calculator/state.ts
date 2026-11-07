@@ -56,6 +56,7 @@ export type Action =
   | { type: 'toggleSign' }
   | { type: 'backspace' }
   | { type: 'clear' }
+  | { type: 'clearHistory' }
   | { type: 'operatorChosen'; op: BinaryOperation }
   | { type: 'requestStarted' }
   | { type: 'binaryResolved'; a: number; op: BinaryOperation; b: number; result: number; nextOp: BinaryOperation | null }
@@ -140,6 +141,9 @@ export function reducer(state: CalculatorState, action: Action): CalculatorState
 
     case 'clear':
       return { ...initialState, history: state.history }
+
+    case 'clearHistory':
+      return state.history.length === 0 ? state : { ...state, history: [] }
 
     case 'operatorChosen':
       if (state.error) return state

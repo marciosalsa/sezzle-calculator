@@ -3,12 +3,12 @@
       Coverage enabled with v8
 
 
- Test Files  4 passed (4)
-      Tests  47 passed (47)
-   Start at  13:11:15
-   Duration  5.22s (environment 52%, tests 27%, setup 14%, worker 4%, import 2%, transform 1%)
+ Test Files  5 passed (5)
+      Tests  64 passed (64)
+   Start at  14:31:40
+   Duration  6.67s (environment 50%, tests 31%, setup 12%, worker 3%, import 2%, transform 1%)
 
-Environment  jsdom was created 4 times · 2.30s total, 52% of tracked time
+Environment  jsdom was created 5 times · 2.91s total, 50% of tracked time
              create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
              learn more: https://vitest.dev/guide/improving-performance#test-environments
 
@@ -16,17 +16,17 @@ Environment  jsdom was created 4 times · 2.30s total, 52% of tracked time
 -------------------|---------|----------|---------|---------|-------------------
 File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
 -------------------|---------|----------|---------|---------|-------------------
-All files          |   96.75 |    95.52 |   97.36 |   98.47 |                   
+All files          |   97.51 |    96.49 |   98.14 |   98.85 |                   
  src/api           |      96 |    94.44 |   83.33 |   95.83 |                   
   client.ts        |      96 |    94.44 |   83.33 |   95.83 | 68                
- src/calculator    |    95.4 |    93.05 |     100 |   98.66 |                   
-  state.ts         |   98.03 |    98.18 |     100 |   97.67 | 121               
-  useCalculator.ts |   91.66 |    76.47 |     100 |     100 | 16-32,43-47       
+ src/calculator    |    95.5 |    93.33 |     100 |    98.7 |                   
+  state.ts         |   98.07 |    98.27 |     100 |   97.72 | 122               
+  useCalculator.ts |   91.89 |    76.47 |     100 |     100 | 16-32,43-47       
 -------------------|---------|----------|---------|---------|-------------------
 
 =============================== Coverage summary ===============================
-Statements   : 96.75% ( 149/154 )
-Branches     : 95.52% ( 128/134 )
-Functions    : 97.36% ( 37/38 )
-Lines        : 98.47% ( 129/131 )
+Statements   : 97.51% ( 196/201 )
+Branches     : 96.49% ( 165/171 )
+Functions    : 98.14% ( 53/54 )
+Lines        : 98.85% ( 172/174 )
 ================================================================================

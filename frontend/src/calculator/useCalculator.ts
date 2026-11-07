@@ -62,6 +62,7 @@ export function useCalculator(client: CalculatorClient = apiClient) {
     toggleSign: () => dispatch({ type: 'toggleSign' }),
     backspace: () => dispatch({ type: 'backspace' }),
     clear: () => dispatch({ type: 'clear' }),
+    clearHistory: () => dispatch({ type: 'clearHistory' }),
     chooseOperator,
     equals,
     squareRoot,

@@ -54,6 +54,20 @@ describe('number entry', () => {
     expect(run([...digits('5'), { type: 'toggleSign' }, { type: 'backspace' }]).display).toBe('0')
   })
 
+  it('clearHistory empties the history and keeps the current calculation', () => {
+    const state: CalculatorState = {
+      ...initialState,
+      display: '7',
+      accumulator: 3,
+      pendingOp: 'add',
+      history: [{ id: 1, expression: '1 + 1', result: '2' }],
+    }
+    const cleared = reducer(state, { type: 'clearHistory' })
+    expect(cleared.history).toEqual([])
+    expect(cleared).toMatchObject({ display: '7', accumulator: 3, pendingOp: 'add' })
+    expect(reducer(cleared, { type: 'clearHistory' })).toBe(cleared)
+  })
+
   it('clear resets everything but keeps history', () => {
     const withHistory: CalculatorState = { ...initialState, display: '9', history: [{ id: 1, expression: '1 + 1', result: '2' }] }
     const cleared = reducer(withHistory, { type: 'clear' })
